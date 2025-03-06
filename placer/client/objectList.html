@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            pointer-events: auto;
+        }
+        #container {
+            width: 300px;
+            position: relative;
+            pointer-events: auto;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            pointer-events: auto;
+        }
+        #resultBox {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            pointer-events: auto;
+        }
+        .result-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+        }
+        .result-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <input type="text" id="searchInput" placeholder="Objekt suchen..." autofocus>
+        <div id="resultBox"></div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const resultBox = document.getElementById('resultBox');
+        let objects = [];
+
+        // Debug-Events
+        searchInput.addEventListener('focus', () => {
+            console.log('Input focused');
+        });
+
+        alt.on('updateObjectList', (objectList) => {
+            objects = objectList;
+            console.log('Received objects:', objects.length);
+        });
+
+        searchInput.addEventListener('input', (event) => {
+            console.log('Input event:', event.target.value);
+            const searchTerm = event.target.value.toLowerCase();
+            
+            if (searchTerm.length < 1) {
+                resultBox.style.display = 'none';
+                return;
+            }
+
+            const matches = objects.filter(obj => 
+                obj.toLowerCase().includes(searchTerm)
+            ).slice(0, 10);
+
+            if (matches.length > 0) {
+                resultBox.innerHTML = matches.map(obj => `
+                    <div class="result-item" onclick="selectObject('${obj}')">
+                        ${obj}
+                    </div>
+                `).join('');
+                resultBox.style.display = 'block';
+            } else {
+                resultBox.style.display = 'none';
+            }
+        });
+
+        function selectObject(object) {
+        alt.emit('objectSelected', object);
+        alt.emit('PlacingModule:setObject', object); // Dies ist die wichtige Zeile
+    }
+
+        // Initial focus
+        searchInput.focus();
+    </script>
+</body>
+</html>
