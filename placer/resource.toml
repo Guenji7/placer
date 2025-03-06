@@ -1,8 +1,0 @@
-type = "js"
-main = "server/_keep.mjs"
-client-main = "client/client.js"
-client-files = [ 
-    "client/*",
-    "client/objectList.html"
-]
-dependencies = ["natives"]
